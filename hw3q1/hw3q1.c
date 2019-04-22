@@ -22,6 +22,7 @@ void print_tie();
 int play_game(int board_size);
 int start_game(char board[N][N], int board_size);
 int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
 int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
 int check_winner_by_row(char board[N][N], int board_size);
@@ -93,88 +94,64 @@ int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_
     return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
 }
 
-// length: 19 lines.
+// length: 6 lines.
 int start_game(char board[N][N], int board_size)
 {
     int chosen_row =0, chosen_column=0, curr_player = 1, move_counter = 0;
-    //int maximum_moves = board_size*board_size,
     int move_history[N*N];
     scanf("%d", &chosen_row);
     while (!is_board_full(board, board_size))
     {
-        if (chosen_row < 0)
-        {
-            if (-1*chosen_row % 2 == 1 && -1*chosen_row <= move_counter)
-            {
-                    return perform_undo(board, board_size, move_counter, chosen_row, curr_player, move_history);
-            }
-            print_error();
-            scanf("%d", &chosen_row);
-            continue;
-        }
-        else
-        {
-            scanf("%d", &chosen_column);
-        }
-        if (check_legal_turn(board, board_size, chosen_row, chosen_column))
-        {
-            return perform_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
-        }
-        else
-        {
-            print_error();
-        }
-        scanf("%d", &chosen_row);
+        return player_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
     }
 
     return 0;
 }
 
-// length: 16 lines.
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N])
+{
+    if (chosen_row < 0)
+    {
+        if (-1*chosen_row % 2 == 1 && -1*chosen_row <= move_counter)
+        {
+            return perform_undo(board, board_size, move_counter, chosen_row, curr_player, move_history);
+        }
+        print_error();
+        scanf("%d", &chosen_row);
+        return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
+    }
+    else
+    {
+        scanf("%d", &chosen_column);
+    }
+    if (check_legal_turn(board, board_size, chosen_row, chosen_column))
+    {
+        return perform_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
+    }
+    else
+    {
+        print_error();
+    }
+    scanf("%d", &chosen_row);
+    return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
+}
+
+// length: 4 lines.
 int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
 {
     int chosen_column=0;
     while (!is_board_full(board, board_size))
     {
-        if (chosen_row < 0)
-        {
-            if (-1*chosen_row % 2 == 1 && -1*chosen_row <= move_counter)
-            {
-                    return perform_undo(board, board_size, move_counter, chosen_row, curr_player, move_history);
-            }
-            print_error();
-            scanf("%d", &chosen_row);
-            continue;
-        }
-        else
-        {
-            scanf("%d", &chosen_column);
-        }
-        if (check_legal_turn(board, board_size, chosen_row, chosen_column))
-        {
-            return perform_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
-        }
-        else
-        {
-            print_error();
-        }
-        scanf("%d", &chosen_row);
+        return player_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
     }
 
     return 0;
 }
 
-// length: 15 lines.
+// length: 12 lines.
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N])
 {
-    if (curr_player == 1)
-    {
-        board[chosen_row-1][chosen_column-1] = 'X';
-    }
-    else
-    {
-        board[chosen_row-1][chosen_column-1] = 'O';
-    }
+    board[chosen_row-1][chosen_column-1] = (curr_player == 1) ? 'X' : 'O';
     move_history[move_counter] = (chosen_row-1)*10+(chosen_column-1);
     move_counter++;
     print_board(board, board_size);
