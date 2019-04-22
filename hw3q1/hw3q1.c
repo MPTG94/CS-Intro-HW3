@@ -7,6 +7,7 @@
 /*-------------------------------------------------------------------------
     Constants and definitions:
 -------------------------------------------------------------------------*/
+// Constant for the maximum size of the board.
 #define N 11
 
 /*-------------------------------------------------------------------------
@@ -23,24 +24,28 @@ int play_game(int board_size);
 int start_game(char board[N][N], int board_size);
 int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
 int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
+int check_winner(char board[N][N], int board_size);
 int check_winner_by_row(char board[N][N], int board_size);
 int check_winner_by_column(char board[N][N], int board_size);
 int check_winner_by_diagonal(char board[N][N], int board_size);
 int check_winner_by_secondary_diagonal(char board[N][N], int board_size);
 bool check_legal_turn(char board[N][N], int board_size, int row, int column);
 bool is_board_full(char board[N][N], int board_size);
-int check_winner(char board[N][N], int board_size);
 
 
 /*-------------------------------------------------------------------------
-    Implementation
+    This is a game of AVOIDANCE TIC-TAC-TOE
 -------------------------------------------------------------------------*/
-// length: 12 lines.
+/*
+    Prints welcome text, will take as input the size of the
+    board and start the game.
+    length: 12 lines.
+*/
 int main()
 {
-    int board_size=0, winner = 0;
+    int board_size = 0, winner = 0;
     print_welcome();
     print_enter_board_size();
     scanf("%d", &board_size);
@@ -60,7 +65,10 @@ int main()
     return 0;
 }
 
-// length: 7 lines.
+/*
+    Setup the board and ask the first player to perform his turn.
+    length: 7 lines.
+*/
 int play_game(int board_size)
 {
     char board[N][N];
@@ -78,26 +86,13 @@ int play_game(int board_size)
     return start_game(board, board_size);
 }
 
-// length: 9 lines.
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
-{
-    int temp = move_counter - 1;
-    for (int i = temp; i > temp - (-1*chosen_row); i--)
-    {
-        move_counter--;
-        board[(move_history[i])/10][(move_history[i])%10] = '_';
-    }
-    print_board(board, board_size);
-    curr_player = 3 - curr_player;
-    print_player_turn(curr_player);
-    scanf("%d", &chosen_row);
-    return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
-}
-
-// length: 6 lines.
+/*
+    Starts the game loop according to input.
+    length: 6 lines.
+*/
 int start_game(char board[N][N], int board_size)
 {
-    int chosen_row =0, chosen_column=0, curr_player = 1, move_counter = 0;
+    int chosen_row = 0, chosen_column = 0, curr_player = 1, move_counter = 0;
     int move_history[N*N];
     scanf("%d", &chosen_row);
     while (!is_board_full(board, board_size))
@@ -108,16 +103,35 @@ int start_game(char board[N][N], int board_size)
     return 0;
 }
 
+/*
+    Continues the game loop according to input.
+    length: 5 lines.
+*/
+int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
+{
+    int chosen_column = 0;
+    scanf("%d", &chosen_row);
+    while (!is_board_full(board, board_size))
+    {
+        return player_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
+    }
+
+    return 0;
+}
+
+/*
+    Checks the input from the player and performs or reverts turns accordingly.
+    length: 12 lines.
+*/
 int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N])
 {
     if (chosen_row < 0)
     {
-        if (-1*chosen_row % 2 == 1 && -1*chosen_row <= move_counter)
+        if (-1 * chosen_row % 2 == 1 && -1 * chosen_row <= move_counter)
         {
             return perform_undo(board, board_size, move_counter, chosen_row, curr_player, move_history);
         }
         print_error();
-        scanf("%d", &chosen_row);
         return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
     }
     else
@@ -132,30 +146,21 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
     {
         print_error();
     }
-    scanf("%d", &chosen_row);
     return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
 }
 
-// length: 4 lines.
-int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
-{
-    int chosen_column=0;
-    while (!is_board_full(board, board_size))
-    {
-        return player_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
-    }
-
-    return 0;
-}
-
-// length: 12 lines.
+/*
+    Modifies the game board according to the turn specified by the player.
+    length: 11 lines.
+*/
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N])
 {
     board[chosen_row-1][chosen_column-1] = (curr_player == 1) ? 'X' : 'O';
-    move_history[move_counter] = (chosen_row-1)*10+(chosen_column-1);
+    // Saving the move in following format: the row is the tens digit, the column is the units digit.
+    move_history[move_counter] = ((chosen_row-1)*10)+(chosen_column-1);
     move_counter++;
     print_board(board, board_size);
-    curr_player = 3 -curr_player;
+    curr_player = 3-curr_player;
     if (check_winner(board, board_size) != 0)
     {
         return check_winner(board, board_size);
@@ -165,55 +170,31 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
         return 0;
     }
     print_player_turn(curr_player);
-    scanf("%d", &chosen_row);
     return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
 }
 
-
 /*
-This function takes as input the board, the board size a row and column
-specified by the user and checks if it is legal to perform a move on the
-selected place on the board.
-The function will return true if the move is legal, false otherwise.
-length: 5 lines.
+    Reverts the board to the correct older state.
+    length: 8 lines.
 */
-bool check_legal_turn(char board[N][N], int board_size, int row, int column)
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
 {
-    if (row > board_size || column > board_size)
+    int moves_before_undo = move_counter - 1;
+    for (int i = moves_before_undo; i > moves_before_undo - (-1*chosen_row); i--)
     {
-        return 0;
+        move_counter--;
+        board[(move_history[i])/10][(move_history[i])%10] = '_';
     }
-    else if (board[row-1][column-1] != '_')
-    {
-        return 0;
-    }
-    return 1;
+    print_board(board, board_size);
+    curr_player = 3 - curr_player;
+    print_player_turn(curr_player);
+    return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
 }
 
 /*
-This function checks if the board is full or not
-The function will return true if the board is full and false otherwise.
-length: 5 lines.
-*/
-bool is_board_full(char board[N][N], int board_size)
-{
-    for (int i =0; i< board_size; i++)
-    {
-        for (int j=0; j<board_size; j++)
-        {
-            if (board[i][j] == '_')
-            {
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-/*
-This function checks if a winner has been decided by checking the the board.
-Returns the index of the winning player, or 0 if no player has won yet.
-length: 13 lines.
+    Checks the board for a winner.
+    Returns the index of the winning player, or 0 if no player has won yet.
+    length: 13 lines.
 */
 int check_winner(char board[N][N], int board_size)
 {
@@ -242,16 +223,16 @@ int check_winner(char board[N][N], int board_size)
 }
 
 /*
-This function checks if a winner has been decided by checking the rows of the board.
-Returns the index of the winning player, or 0 if no player has won yet.
-length: 13 lines.
+    Checks the rows of the board for a winner.
+    Returns the index of the winning player, or 0 if no player has won yet.
+    length: 13 lines.
 */
 int check_winner_by_row(char board[N][N], int board_size)
 {
     int streak_length = 0;
     for (int i = 0; i < board_size; i++)
     {
-        for (int j=0; j<board_size - 1; j++)
+        for (int j=0; j < board_size-1; j++)
         {
             if (board[i][j] == board[i][j+1] && board[i][j] != '_')
             {
@@ -264,18 +245,15 @@ int check_winner_by_row(char board[N][N], int board_size)
             // Checking who the loser is.
             if (board[i][1] == 'X')
             {
-                // The winner is player 2.
                 return 2;
             }
             else
             {
-                // The winner is player 1.
                 return 1;
             }
         }
         else
         {
-            // Resetting streak counter.
             streak_length = 0;
         }
     }
@@ -283,16 +261,16 @@ int check_winner_by_row(char board[N][N], int board_size)
 }
 
 /*
-This function checks if a winner has been decided by checking the columns of the board.
-Returns the index of the winning player, or 0 if no player has won yet.
-length: 13 lines.
+    Checks the columns of the board for a winner.
+    Returns the index of the winning player, or 0 if no player has won yet.
+    length: 13 lines.
 */
 int check_winner_by_column(char board[N][N], int board_size)
 {
     int streak_length = 0;
     for (int i = 0; i < board_size; i++)
     {
-        for (int j=0; j<board_size - 1; j++)
+        for (int j=0; j<board_size-1; j++)
         {
             if (board[j][i] == board[j+1][i] && board[j][i] != '_')
             {
@@ -301,22 +279,17 @@ int check_winner_by_column(char board[N][N], int board_size)
         }
         if (streak_length == board_size -1)
         {
-            // There is a streak of X's or O's that fills an entire column
-            // Checking who the loser is.
             if (board[1][i] == 'X')
             {
-                // The winner is player 2.
                 return 2;
             }
             else
             {
-                // The winner is player 1.
                 return 1;
             }
         }
         else
         {
-            // Resetting streak counter.
             streak_length = 0;
         }
     }
@@ -324,14 +297,14 @@ int check_winner_by_column(char board[N][N], int board_size)
 }
 
 /*
-This function checks if a winner has been decided by checking the primary diagonal of the board.
-Returns the index of the winning player, or 0 if no player has won yet.
-length: 10 lines.
+    Checks the primary diagonal of the board for a winner.
+    Returns the index of the winning player, or 0 if no player has won yet.
+    length: 10 lines.
 */
 int check_winner_by_diagonal(char board[N][N], int board_size)
 {
     int streak_length = 0;
-    for (int i = 0; i < board_size - 1; i++)
+    for (int i = 0; i < board_size-1; i++)
     {
         if (board[i][i] == board[i+1][i+1] && board[i][i] != '_')
         {
@@ -340,16 +313,12 @@ int check_winner_by_diagonal(char board[N][N], int board_size)
     }
     if (streak_length == board_size -1)
     {
-        // There is a streak of X's or O's that fills the entire diagonal
-        // Checking who the loser is.
         if (board[0][0] == 'X')
         {
-            // The winner is player 2.
             return 2;
         }
         else
         {
-            // The winner is player 1.
             return 1;
         }
     }
@@ -357,36 +326,68 @@ int check_winner_by_diagonal(char board[N][N], int board_size)
 }
 
 /*
-This function checks if a winner has been decided by checking the secondary diagonal of the board.
-Returns the index of the winning player, or 0 if no player has won yet.
-length: 10 lines.
+    Checks the secondary diagonal of the board for a winner.
+    Returns the index of the winning player, or 0 if no player has won yet.
+    length: 10 lines.
 */
 int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
 {
     int streak_length = 0;
-    for (int i = 0; i < board_size - 1; i++)
+    for (int i = 0; i < board_size-1; i++)
     {
-        if (board[i][board_size - i -1] == board[i+1][board_size - i -2] && board[i][board_size - i -1] != '_')
+        if (board[i][board_size-i-1] == board[i+1][board_size-i-2] && board[i][board_size-i-1] != '_')
         {
             streak_length++;
         }
     }
-    if (streak_length == board_size -1)
+    if (streak_length == board_size-1)
     {
-        // There is a streak of X's or O's that fills the entire diagonal
-        // Checking who the loser is.
         if (board[board_size-1][0] == 'X')
         {
-            // The winner is player 2.
             return 2;
         }
         else
         {
-            // The winner is player 1.
             return 1;
         }
     }
     return 0;
+}
+
+/*
+    Returns true if the move requested is legal, false otherwise.
+    length: 5 lines.
+*/
+bool check_legal_turn(char board[N][N], int board_size, int row, int column)
+{
+    if (row > board_size || column > board_size)
+    {
+        return 0;
+    }
+    else if (board[row-1][column-1] != '_')
+    {
+        return 0;
+    }
+    return 1;
+}
+
+/*
+    Returns true of the board is full, false otherwise.
+    length: 5 lines.
+*/
+bool is_board_full(char board[N][N], int board_size)
+{
+    for (int i = 0; i < board_size; i++)
+    {
+        for (int j=0; j<board_size; j++)
+        {
+            if (board[i][j] == '_')
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
 
 //print welcome message
