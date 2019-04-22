@@ -19,7 +19,7 @@ void print_player_turn(int player_index);
 void print_error();
 void print_winner(int player_index);
 void print_tie();
-int setup_board(int board_size);
+int play_game(int board_size);
 int start_game(char board[N][N], int board_size);
 int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
 int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
@@ -43,7 +43,7 @@ int main()
     print_welcome();
     print_enter_board_size();
     scanf("%d", &board_size);
-    winner = setup_board(board_size);
+    winner = play_game(board_size);
     if (winner == 0)
     {
         print_tie();
@@ -60,7 +60,7 @@ int main()
 }
 
 // length: 7 lines.
-int setup_board(int board_size)
+int play_game(int board_size)
 {
     char board[N][N];
     for(int i = 0; i < board_size; i++)
@@ -96,9 +96,8 @@ int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_
 // length: 19 lines.
 int start_game(char board[N][N], int board_size)
 {
-    int chosen_row =0, chosen_column=0, curr_player = 1;
+    int chosen_row =0, chosen_column=0, curr_player = 1, move_counter = 0;
     //int maximum_moves = board_size*board_size,
-    int move_counter = 0;
     int move_history[N*N];
     scanf("%d", &chosen_row);
     while (!is_board_full(board, board_size))
