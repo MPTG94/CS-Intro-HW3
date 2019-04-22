@@ -79,7 +79,6 @@ int play_game(int board_size)
             board[i][j] = '_';
         }
     }
-
     print_board(board, board_size);
     print_player_turn(1);
 
