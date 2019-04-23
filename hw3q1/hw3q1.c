@@ -74,7 +74,7 @@ int play_game(int board_size)
     char board[N][N];
     for(int i = 0; i < board_size; i++)
     {
-        for(int j=0; j<board_size; j++)
+        for(int j = 0; j < board_size; j++)
         {
             board[i][j] = '_';
         }
@@ -156,10 +156,10 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
 {
     board[chosen_row-1][chosen_column-1] = (curr_player == 1) ? 'X' : 'O';
     // Saving the move in following format: the row is the tens digit, the column is the units digit.
-    move_history[move_counter] = ((chosen_row-1)*10)+(chosen_column-1);
+    move_history[move_counter] = ((chosen_row - 1) * 10)+(chosen_column - 1);
     move_counter++;
     print_board(board, board_size);
-    curr_player = 3-curr_player;
+    curr_player = 3 - curr_player;
     if (check_winner(board, board_size) != 0)
     {
         return check_winner(board, board_size);
@@ -179,7 +179,7 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
 int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
 {
     int moves_before_undo = move_counter - 1;
-    for (int i = moves_before_undo; i > moves_before_undo - (-1*chosen_row); i--)
+    for (int i = moves_before_undo; i > moves_before_undo - (-1 * chosen_row); i--)
     {
         move_counter--;
         board[(move_history[i])/10][(move_history[i])%10] = '_';
@@ -231,7 +231,7 @@ int check_winner_by_row(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size; i++)
     {
-        for (int j=0; j < board_size-1; j++)
+        for (int j = 0; j < board_size - 1; j++)
         {
             if (board[i][j] == board[i][j+1] && board[i][j] != '_')
             {
@@ -242,7 +242,7 @@ int check_winner_by_row(char board[N][N], int board_size)
         {
             // There is a streak of X's or O's that fills an entire row
             // Checking who the loser is.
-            if (board[i][1] == 'X')
+            if (board[i][0] == 'X')
             {
                 return 2;
             }
@@ -269,7 +269,7 @@ int check_winner_by_column(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size; i++)
     {
-        for (int j=0; j<board_size-1; j++)
+        for (int j = 0; j< board_size - 1; j++)
         {
             if (board[j][i] == board[j+1][i] && board[j][i] != '_')
             {
@@ -278,7 +278,7 @@ int check_winner_by_column(char board[N][N], int board_size)
         }
         if (streak_length == board_size -1)
         {
-            if (board[1][i] == 'X')
+            if (board[0][i] == 'X')
             {
                 return 2;
             }
@@ -303,14 +303,14 @@ int check_winner_by_column(char board[N][N], int board_size)
 int check_winner_by_diagonal(char board[N][N], int board_size)
 {
     int streak_length = 0;
-    for (int i = 0; i < board_size-1; i++)
+    for (int i = 0; i < board_size - 1; i++)
     {
         if (board[i][i] == board[i+1][i+1] && board[i][i] != '_')
         {
             streak_length++;
         }
     }
-    if (streak_length == board_size -1)
+    if (streak_length == board_size - 1)
     {
         if (board[0][0] == 'X')
         {
@@ -332,14 +332,14 @@ int check_winner_by_diagonal(char board[N][N], int board_size)
 int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
 {
     int streak_length = 0;
-    for (int i = 0; i < board_size-1; i++)
+    for (int i = 0; i < board_size - 1; i++)
     {
         if (board[i][board_size-i-1] == board[i+1][board_size-i-2] && board[i][board_size-i-1] != '_')
         {
             streak_length++;
         }
     }
-    if (streak_length == board_size-1)
+    if (streak_length == board_size - 1)
     {
         if (board[board_size-1][0] == 'X')
         {
@@ -378,7 +378,7 @@ bool is_board_full(char board[N][N], int board_size)
 {
     for (int i = 0; i < board_size; i++)
     {
-        for (int j=0; j<board_size; j++)
+        for (int j = 0; j < board_size; j++)
         {
             if (board[i][j] == '_')
             {
