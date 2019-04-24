@@ -21,7 +21,6 @@ void print_error();
 void print_winner(int player_index);
 void print_tie();
 int play_game(int board_size);
-int start_game(char board[N][N], int board_size);
 int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N]);
 int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N]);
@@ -67,11 +66,12 @@ int main()
 
 /*
     Setup the board and ask the first player to perform his turn.
-    length: 7 lines.
+    length: 8 lines.
 */
 int play_game(int board_size)
 {
     char board[N][N];
+    int move_history[N*N];
     for(int i = 0; i < board_size; i++)
     {
         for(int j = 0; j < board_size; j++)
@@ -82,24 +82,7 @@ int play_game(int board_size)
     print_board(board, board_size);
     print_player_turn(1);
 
-    return start_game(board, board_size);
-}
-
-/*
-    Starts the game loop according to input.
-    length: 6 lines.
-*/
-int start_game(char board[N][N], int board_size)
-{
-    int chosen_row = 0, chosen_column = 0, curr_player = 1, move_counter = 0;
-    int move_history[N*N];
-    scanf("%d", &chosen_row);
-    while (!is_board_full(board, board_size))
-    {
-        return player_turn(board, board_size, move_counter, chosen_row, chosen_column, curr_player, move_history);
-    }
-
-    return 0;
+    return continue_game(board, board_size, 0, 0, 1, move_history);
 }
 
 /*
