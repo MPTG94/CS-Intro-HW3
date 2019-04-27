@@ -9,6 +9,7 @@
 -------------------------------------------------------------------------*/
 // Constant for the maximum size of the board.
 #define N 11
+#define FIRST_PLAYER_INDEX 1
 
 /*-------------------------------------------------------------------------
     Function declaration
@@ -82,7 +83,7 @@ int play_game(int board_size)
     print_board(board, board_size);
     print_player_turn(1);
 
-    return continue_game(board, board_size, 0, 0, 1, move_history);
+    return continue_game(board, board_size, 0, 0, FIRST_PLAYER_INDEX, move_history);
 }
 
 /*
@@ -109,9 +110,9 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
 {
     if (chosen_row < 0)
     {
-        if (-1 * chosen_row % 2 == 1 && -1 * chosen_row <= move_counter)
+        if (-1 * chosen_row % 2 == 1 && -1 * (chosen_row * 2) <= move_counter)
         {
-            return perform_undo(board, board_size, move_counter, chosen_row, curr_player, move_history);
+            return perform_undo(board, board_size, move_counter, chosen_row * 2, curr_player, move_history);
         }
         print_error();
         return continue_game(board, board_size, move_counter, chosen_row, curr_player, move_history);
@@ -133,14 +134,15 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
 
 /*
     Modifies the game board according to the turn specified by the player.
-    length: 11 lines.
+    length: 12 lines.
 */
 int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[N*N])
 {
     board[chosen_row-1][chosen_column-1] = (curr_player == 1) ? 'X' : 'O';
-    // Saving the move in following format: the row is the tens digit, the column is the units digit.
-    move_history[move_counter] = ((chosen_row - 1) * 10)+(chosen_column - 1);
-    move_counter++;
+    // Saving the move in following format: the row is first index in every pair, the column is the second index.
+    move_history[move_counter] = chosen_row - 1;
+    move_history[move_counter+1] = chosen_column - 1;
+    move_counter = move_counter + 2;
     print_board(board, board_size);
     curr_player = 3 - curr_player;
     if (check_winner(board, board_size) != 0)
@@ -161,11 +163,11 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
 */
 int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
 {
-    int moves_before_undo = move_counter - 1;
-    for (int i = moves_before_undo; i > moves_before_undo - (-1 * chosen_row); i--)
+    int moves_before_undo = move_counter;
+    for (int i = moves_before_undo - 1; i > moves_before_undo - (-1 * chosen_row); i=i-2)
     {
-        move_counter--;
-        board[(move_history[i])/10][(move_history[i])%10] = '_';
+        move_counter = move_counter - 2;
+        board[move_history[i-1]][move_history[i]] = '_';
     }
     print_board(board, board_size);
     curr_player = 3 - curr_player;
