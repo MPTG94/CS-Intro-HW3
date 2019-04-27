@@ -342,7 +342,8 @@ int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
 */
 bool check_legal_turn(char board[N][N], int board_size, int row, int column)
 {
-    if (row > board_size || column > board_size)
+    // Checking that the row and column specified are within the legal ranges of the board.
+    if (row > board_size || column > board_size || row < 1 || column < 1)
     {
         return 0;
     }
