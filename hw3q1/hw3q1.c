@@ -72,7 +72,8 @@ int main()
 int play_game(int board_size)
 {
     char board[N][N];
-    int move_history[N*N];
+    // Move history array size is the maximum number of moves, multiplied by 2 because each move is saved as a pair.
+    int move_history[N*N*2];
     for(int i = 0; i < board_size; i++)
     {
         for(int j = 0; j < board_size; j++)
@@ -110,6 +111,8 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
 {
     if (chosen_row < 0)
     {
+        // Multiplying the number of unwanted moves by 2 in order to compare to the current paired moves
+        // that are already saved in the history array.
         if (-1 * chosen_row % 2 == 1 && -1 * (chosen_row * 2) <= move_counter)
         {
             return perform_undo(board, board_size, move_counter, chosen_row * 2, curr_player, move_history);
@@ -164,7 +167,7 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
 int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[N*N])
 {
     int moves_before_undo = move_counter;
-    for (int i = moves_before_undo - 1; i > moves_before_undo - (-1 * chosen_row); i=i-2)
+    for (int i = moves_before_undo - 1; i > moves_before_undo - (-1 * chosen_row); i = i - 2)
     {
         move_counter = move_counter - 2;
         board[move_history[i-1]][move_history[i]] = '_';
