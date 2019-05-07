@@ -7,7 +7,6 @@
 /*-------------------------------------------------------------------------
     Constants and definitions:
 -------------------------------------------------------------------------*/
-// Constant for the maximum size of the board.
 #define N 11
 #define FIRST_PLAYER_INDEX 1
 #define PLAYER_INDEX_BASE 3
