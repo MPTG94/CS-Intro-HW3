@@ -26,10 +26,10 @@ void print_error();
 void print_winner(int player_index);
 void print_tie();
 int play_game(int board_size);
-int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N*N]);
-int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N*N]);
-int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N*N]);
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N*N]);
+int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N]);
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N]);
+int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N]);
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N]);
 int check_winner(char board[N][N], int board_size);
 int check_winner_by_row(char board[N][N], int board_size);
 int check_winner_by_column(char board[N][N], int board_size);
@@ -37,7 +37,6 @@ int check_winner_by_diagonal(char board[N][N], int board_size);
 int check_winner_by_secondary_diagonal(char board[N][N], int board_size);
 bool check_legal_turn(char board[N][N], int board_size, int row, int column);
 bool is_board_full(char board[N][N], int board_size);
-
 
 /*-------------------------------------------------------------------------
     This is a game of AVOIDANCE TIC-TAC-TOE
@@ -76,11 +75,11 @@ int main()
 int play_game(int board_size)
 {
     char board[N][N];
-    // Move history saves every turn as a row and column pair in the 2 rows of the history array.
-    int move_history[2][N*N];
-    for(int i = 0; i < board_size; i++)
+    // move_history saves every turn as a row and column pair in the 2 rows of the history array.
+    int move_history[2][N * N];
+    for (int i = 0; i < board_size; i++)
     {
-        for(int j = 0; j < board_size; j++)
+        for (int j = 0; j < board_size; j++)
         {
             board[i][j] = EMPTY_BOARD_CHAR;
         }
@@ -95,7 +94,7 @@ int play_game(int board_size)
     Continues the game loop according to input.
     length: 5 lines.
 */
-int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N*N])
+int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N])
 {
     int chosen_column = 0;
     scanf("%d", &chosen_row);
@@ -111,7 +110,7 @@ int continue_game(char board[N][N], int board_size, int move_counter, int chosen
     Checks the input from the player and performs or reverts turns accordingly.
     length: 12 lines.
 */
-int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N*N])
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N])
 {
     if (chosen_row < 0)
     {
@@ -141,9 +140,9 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
     Modifies the game board according to the turn specified by the player.
     length: 12 lines.
 */
-int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N*N])
+int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N])
 {
-    board[chosen_row-1][chosen_column-1] = (curr_player == FIRST_PLAYER_INDEX) ? FIRST_PLAYER_CHAR : SECOND_PLAYER_CHAR;
+    board[chosen_row - 1][chosen_column - 1] = (curr_player == FIRST_PLAYER_INDEX) ? FIRST_PLAYER_CHAR : SECOND_PLAYER_CHAR;
     // Saving the move in following format: the row is saved in the first row, the column is saved in the second row.
     move_history[0][move_counter] = chosen_row - 1;
     move_history[1][move_counter] = chosen_column - 1;
@@ -166,9 +165,9 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
     Reverts the board to the correct older state.
     length: 8 lines.
 */
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N*N])
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N])
 {
-    int moves_before_undo = move_counter -1;
+    int moves_before_undo = move_counter - 1;
     for (int i = moves_before_undo; i > moves_before_undo + chosen_row; i--)
     {
         move_counter--;
@@ -223,12 +222,12 @@ int check_winner_by_row(char board[N][N], int board_size)
     {
         for (int j = 0; j < board_size - 1; j++)
         {
-            if (board[i][j] == board[i][j+1] && board[i][j] != EMPTY_BOARD_CHAR)
+            if (board[i][j] == board[i][j + 1] && board[i][j] != EMPTY_BOARD_CHAR)
             {
                 streak_length++;
             }
         }
-        if (streak_length == board_size -1)
+        if (streak_length == board_size - 1)
         {
             if (board[i][0] == FIRST_PLAYER_CHAR)
             {
@@ -257,14 +256,14 @@ int check_winner_by_column(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size; i++)
     {
-        for (int j = 0; j< board_size - 1; j++)
+        for (int j = 0; j < board_size - 1; j++)
         {
-            if (board[j][i] == board[j+1][i] && board[j][i] != EMPTY_BOARD_CHAR)
+            if (board[j][i] == board[j + 1][i] && board[j][i] != EMPTY_BOARD_CHAR)
             {
                 streak_length++;
             }
         }
-        if (streak_length == board_size -1)
+        if (streak_length == board_size - 1)
         {
             if (board[0][i] == FIRST_PLAYER_CHAR)
             {
@@ -293,7 +292,7 @@ int check_winner_by_diagonal(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size - 1; i++)
     {
-        if (board[i][i] == board[i+1][i+1] && board[i][i] != EMPTY_BOARD_CHAR)
+        if (board[i][i] == board[i + 1][i + 1] && board[i][i] != EMPTY_BOARD_CHAR)
         {
             streak_length++;
         }
@@ -322,14 +321,14 @@ int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size - 1; i++)
     {
-        if (board[i][board_size-i-1] == board[i+1][board_size-i-2] && board[i][board_size-i-1] != EMPTY_BOARD_CHAR)
+        if (board[i][board_size - i - 1] == board[i + 1][board_size - i - 2] && board[i][board_size - i - 1] != EMPTY_BOARD_CHAR)
         {
             streak_length++;
         }
     }
     if (streak_length == board_size - 1)
     {
-        if (board[board_size-1][0] == FIRST_PLAYER_CHAR)
+        if (board[board_size - 1][0] == FIRST_PLAYER_CHAR)
         {
             return 2;
         }
@@ -352,7 +351,7 @@ bool check_legal_turn(char board[N][N], int board_size, int row, int column)
     {
         return 0;
     }
-    else if (board[row-1][column-1] != EMPTY_BOARD_CHAR)
+    else if (board[row - 1][column - 1] != EMPTY_BOARD_CHAR)
     {
         return 0;
     }
