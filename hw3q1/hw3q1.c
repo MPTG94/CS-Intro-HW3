@@ -9,11 +9,14 @@
 -------------------------------------------------------------------------*/
 #define N 11
 #define FIRST_PLAYER_INDEX 1
+#define SECOND_PLAYER_INDEX 2
 #define PLAYER_INDEX_BASE 3
 #define FIRST_PLAYER_CHAR 'X'
 #define SECOND_PLAYER_CHAR 'O'
 #define EMPTY_BOARD_CHAR '_'
+#define HIST_ROWS 2
 #define EVEN_ODD_DIVISOR 2
+#define SEC_DIAG_CHECK 2
 
 /*-------------------------------------------------------------------------
     Function declaration
@@ -26,10 +29,10 @@ void print_error();
 void print_winner(int player_index);
 void print_tie();
 int play_game(int board_size);
-int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N]);
-int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N]);
-int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N]);
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N]);
+int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[HIST_ROWS][N * N]);
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[HIST_ROWS][N * N]);
+int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[HIST_ROWS][N * N]);
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[HIST_ROWS][N * N]);
 int check_winner(char board[N][N], int board_size);
 int check_winner_by_row(char board[N][N], int board_size);
 int check_winner_by_column(char board[N][N], int board_size);
@@ -76,7 +79,7 @@ int play_game(int board_size)
 {
     char board[N][N];
     // move_history saves every turn as a row and column pair in the 2 rows of the history array.
-    int move_history[2][N * N];
+    int move_history[HIST_ROWS][N * N];
     for (int i = 0; i < board_size; i++)
     {
         for (int j = 0; j < board_size; j++)
@@ -94,7 +97,7 @@ int play_game(int board_size)
     Continues the game loop according to input.
     length: 5 lines.
 */
-int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N])
+int continue_game(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[HIST_ROWS][N * N])
 {
     int chosen_column = 0;
     scanf("%d", &chosen_row);
@@ -110,7 +113,7 @@ int continue_game(char board[N][N], int board_size, int move_counter, int chosen
     Checks the input from the player and performs or reverts turns accordingly.
     length: 12 lines.
 */
-int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N])
+int player_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[HIST_ROWS][N * N])
 {
     if (chosen_row < 0)
     {
@@ -140,7 +143,7 @@ int player_turn(char board[N][N], int board_size, int move_counter, int chosen_r
     Modifies the game board according to the turn specified by the player.
     length: 12 lines.
 */
-int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[2][N * N])
+int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_row, int chosen_column, int curr_player, int move_history[HIST_ROWS][N * N])
 {
     board[chosen_row - 1][chosen_column - 1] = (curr_player == FIRST_PLAYER_INDEX) ? FIRST_PLAYER_CHAR : SECOND_PLAYER_CHAR;
     // Saving the move in following format: the row is saved in the first row, the column is saved in the second row.
@@ -165,7 +168,7 @@ int perform_turn(char board[N][N], int board_size, int move_counter, int chosen_
     Reverts the board to the correct older state.
     length: 8 lines.
 */
-int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[2][N * N])
+int perform_undo(char board[N][N], int board_size, int move_counter, int chosen_row, int curr_player, int move_history[HIST_ROWS][N * N])
 {
     int moves_before_undo = move_counter - 1;
     for (int i = moves_before_undo; i > moves_before_undo + chosen_row; i--)
@@ -231,11 +234,11 @@ int check_winner_by_row(char board[N][N], int board_size)
         {
             if (board[i][0] == FIRST_PLAYER_CHAR)
             {
-                return 2;
+                return SECOND_PLAYER_INDEX;
             }
             else
             {
-                return 1;
+                return FIRST_PLAYER_INDEX;
             }
         }
         else
@@ -267,11 +270,11 @@ int check_winner_by_column(char board[N][N], int board_size)
         {
             if (board[0][i] == FIRST_PLAYER_CHAR)
             {
-                return 2;
+                return SECOND_PLAYER_INDEX;
             }
             else
             {
-                return 1;
+                return FIRST_PLAYER_INDEX;
             }
         }
         else
@@ -301,11 +304,11 @@ int check_winner_by_diagonal(char board[N][N], int board_size)
     {
         if (board[0][0] == FIRST_PLAYER_CHAR)
         {
-            return 2;
+            return SECOND_PLAYER_INDEX;
         }
         else
         {
-            return 1;
+            return FIRST_PLAYER_INDEX;
         }
     }
     return 0;
@@ -321,7 +324,7 @@ int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
     int streak_length = 0;
     for (int i = 0; i < board_size - 1; i++)
     {
-        if (board[i][board_size - i - 1] == board[i + 1][board_size - i - 2] && board[i][board_size - i - 1] != EMPTY_BOARD_CHAR)
+        if (board[i][board_size - i - 1] == board[i + 1][board_size - i - SEC_DIAG_CHECK] && board[i][board_size - i - 1] != EMPTY_BOARD_CHAR)
         {
             streak_length++;
         }
@@ -330,11 +333,11 @@ int check_winner_by_secondary_diagonal(char board[N][N], int board_size)
     {
         if (board[board_size - 1][0] == FIRST_PLAYER_CHAR)
         {
-            return 2;
+            return SECOND_PLAYER_INDEX;
         }
         else
         {
-            return 1;
+            return FIRST_PLAYER_INDEX;
         }
     }
     return 0;
